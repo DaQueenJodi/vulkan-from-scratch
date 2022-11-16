@@ -9,3 +9,4 @@ edition = "2021"
 ash = { version = "0.37.0", features = ["linked"] }
 vk-shader-macros = "0.2.8"
 winit = "0.27.5"
+colored = "2"
