@@ -7,6 +7,7 @@ use crate::ctx::debug::my_debug_callback;
 use self::debug::DebugCtx;
 mod debug;
 mod rendering;
+mod surface;
 
 pub struct Ctx {
     pub queues: QueuesCtx,
@@ -78,13 +79,6 @@ impl Ctx {
             flags: vk::CommandPoolCreateFlags::empty(),
             ..Default::default()
         };
-
-        let command_pool = unsafe {
-            logical_device
-                .create_command_pool(&command_pool_create_info, None)
-                .unwrap()
-        };
-
 
         Self {
             queues,
@@ -171,9 +165,17 @@ impl QueuesCtx {
             transfer_queue_device_create_info,
         ];
 
+        //TODO: make this not hard coded
+
+        let device_extension_name_pointers = [
+            ash::extensions::khr::Swapchain::name().as_ptr(),
+        ];
+
         let device_create_info = vk::DeviceCreateInfo {
             queue_create_info_count: queue_create_infos.len() as u32,
             p_queue_create_infos: &queue_create_infos as *const _,
+            pp_enabled_extension_names: device_extension_name_pointers.as_ptr(),
+            enabled_extension_count: device_extension_name_pointers.len() as u32,
             flags: vk::DeviceCreateFlags::empty(),
             ..Default::default()
         };

@@ -1,9 +1,5 @@
 use ash::vk;
 use ctx::Ctx;
-use winit::{
-    event::{Event, WindowEvent},
-    event_loop::ControlFlow,
-};
 
 mod ctx;
 
@@ -14,7 +10,7 @@ fn main() {
     };
 
     let layer_names = ["VK_LAYER_KHRONOS_validation"];
-    let extension_names = ["VK_EXT_debug_utils"];
+    let extension_names = ["VK_EXT_debug_utils", "VK_KHR_surface"];
 
     let ctx = Ctx::new(&app_info, &layer_names, &extension_names);
 }

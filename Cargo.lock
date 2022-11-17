@@ -30,6 +30,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "ash-window"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b912285a7c29f3a8f87ca6f55afc48768624e5e33ec17dbd2f2075903f5e35ab"
+dependencies = [
+ "ash",
+ "raw-window-handle 0.5.0",
+ "raw-window-metal",
+]
+
+[[package]]
 name = "atty"
 version = "0.2.14"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -660,16 +671,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "on_my_own"
-version = "0.1.0"
-dependencies = [
- "ash",
- "colored",
- "vk-shader-macros",
- "winit",
-]
-
-[[package]]
 name = "once_cell"
 version = "1.16.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -767,6 +768,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ed7e3d950b66e19e0c372f3fa3fbbcf85b1746b571f74e0c2af6042a5c93420a"
 dependencies = [
  "cty",
+]
+
+[[package]]
+name = "raw-window-metal"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5d18241d631f19847a5f4cc0a3f81d978202c375573ab7d90ab14dcf0a9262ec"
+dependencies = [
+ "cocoa",
+ "core-graphics",
+ "objc",
+ "raw-window-handle 0.5.0",
 ]
 
 [[package]]
@@ -1002,6 +1015,18 @@ dependencies = [
  "quote",
  "shaderc",
  "syn",
+]
+
+[[package]]
+name = "vulkan-from-scratch"
+version = "0.1.0"
+dependencies = [
+ "ash",
+ "ash-window",
+ "colored",
+ "raw-window-handle 0.5.0",
+ "vk-shader-macros",
+ "winit",
 ]
 
 [[package]]
