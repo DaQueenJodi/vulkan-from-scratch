@@ -74,12 +74,6 @@ impl Ctx {
 
         let (queues, logical_device) = QueuesCtx::new(&instance, physical_device);
 
-        let command_pool_create_info = vk::CommandPoolCreateInfo {
-            queue_family_index: queues.transfer_index as u32,
-            flags: vk::CommandPoolCreateFlags::empty(),
-            ..Default::default()
-        };
-
         Self {
             queues,
             logical_device,
@@ -104,9 +98,7 @@ impl Drop for Ctx {
 }
 
 pub struct QueuesCtx {
-    pub transfer_queue: vk::Queue,
     pub graphics_queue: vk::Queue,
-    pub transfer_index: usize,
     pub graphics_index: usize,
 }
 
@@ -118,7 +110,6 @@ impl QueuesCtx {
         // todo: make this not bundled together, for now its just convenient
         let mut transfer_queue: Option<vk::Queue>;
         let graphics_queue: Option<vk::Queue>;
-        let mut transfer_index: Option<usize> = None;
         let mut graphics_index: Option<usize> = None;
 
         // get list of queue families and pick out a graphics and transfer queue
@@ -132,14 +123,11 @@ impl QueuesCtx {
                 .contains(vk::QueueFlags::GRAPHICS)
             {
                 graphics_index = Some(queue_family_index);
-            } else if transfer_index.is_none()
-                || queue_family_properties
-                    .queue_flags
-                    .contains(vk::QueueFlags::TRANSFER)
-            // default to non-graphics queue, but prefer TRANSFER queue {
-            {
-                transfer_index = Some(queue_family_index);
             }
+        }
+
+        if graphics_index.is_none() {
+            panic!("could not find a graphics transfer queue, good luck with that lmao");
         }
 
         let queue_priorities = [1.0]; // make both queues high priority for now
@@ -152,24 +140,11 @@ impl QueuesCtx {
             ..Default::default()
         };
 
-        let transfer_queue_device_create_info = vk::DeviceQueueCreateInfo {
-            queue_count: 1,
-            queue_family_index: transfer_index.unwrap() as u32,
-            flags: vk::DeviceQueueCreateFlags::empty(),
-            p_queue_priorities: &queue_priorities as *const _ as *const f32,
-            ..Default::default()
-        };
-
-        let queue_create_infos = [
-            graphics_queue_device_create_info,
-            transfer_queue_device_create_info,
-        ];
+        let queue_create_infos = [graphics_queue_device_create_info];
 
         //TODO: make this not hard coded
 
-        let device_extension_name_pointers = [
-            ash::extensions::khr::Swapchain::name().as_ptr(),
-        ];
+        let device_extension_name_pointers = [ash::extensions::khr::Swapchain::name().as_ptr()];
 
         let device_create_info = vk::DeviceCreateInfo {
             queue_create_info_count: queue_create_infos.len() as u32,
@@ -192,26 +167,14 @@ impl QueuesCtx {
                 panic!("could not find a graphics queue for some reason, good luck with that ig")
             }
         };
-        transfer_queue = match transfer_index {
-            Some(index) => unsafe { Some(logical_device.get_device_queue(index as u32, 0)) },
-            None => {
-                eprintln!("could not find dedicated transfer queue, going to use the graphics queue for both operations!");
-                graphics_queue
-            }
-        };
 
         if graphics_queue.is_none() {
             panic!("could not get graphics queue :(")
-        }
-        if transfer_queue.is_none() {
-            transfer_queue = graphics_queue
         }
 
         (
             Self {
                 graphics_index: graphics_index.unwrap(),
-                transfer_index: transfer_index.unwrap(),
-                transfer_queue: transfer_queue.unwrap(),
                 graphics_queue: graphics_queue.unwrap(),
             },
             logical_device,
